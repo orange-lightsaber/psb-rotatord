@@ -72,7 +72,7 @@ func (req *Request) NewRequest() (res *Response, err error) {
 	go func() {
 		defer wg.Done()
 		decoder := gob.NewDecoder(c)
-		timeout := time.After(2 * time.Minute)
+		timeout := time.After(10 * time.Second)
 		tick := time.Tick(50 * time.Millisecond)
 	AwaitResponse:
 		for {
