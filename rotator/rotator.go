@@ -232,7 +232,7 @@ func rotate(rcd RunConfigData) error {
 		relTimePath := now.Format(Config.DatePath.TimeLayout)
 		newTimePath := filepath.Join(psbDir, relTimePath)
 		if _, err := os.Stat(newTimePath); !os.IsNotExist(err) {
-			return fmt.Errorf("the directory \"%s\" already exists, this probably means a post-run operation is running unexpectedly", newTimePath)
+			return fmt.Errorf("the directory \"%s\" already exists, this probably means a rotation is running unexpectedly", newTimePath)
 		}
 		if err := os.MkdirAll(filepath.Dir(newTimePath), 0755); err != nil {
 			return err
@@ -362,7 +362,7 @@ func TimeSinceLastRun(name string) (res string, err error) {
 	return
 }
 
-func PreRun(rcd RunConfigData) (res string, err error) {
+func InitRun(rcd RunConfigData) (res string, err error) {
 	if rcd.Name != rcds[rcd.Name].Name {
 		rcd = rcdInit(rcd)
 		if err != nil {
@@ -379,14 +379,11 @@ func PreRun(rcd RunConfigData) (res string, err error) {
 	return
 }
 
-func PostRun(rcd RunConfigData) (res string, err error) {
-	if rcd.CompatibilityKey != rcds[rcd.Name].CompatibilityKey {
-		err = errors.New("invalid compatibility key")
-		return
-	}
+func Rotate(rcd RunConfigData) (res string, err error) {
 	err = rotate(rcds[rcd.Name])
 	if err != nil {
 		err = fmt.Errorf("error during rotation: %s", err.Error())
+		return
 	}
 	res = rcds[rcd.Name].lastRun.String()
 	return

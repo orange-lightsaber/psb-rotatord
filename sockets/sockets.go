@@ -23,8 +23,8 @@ type Response struct {
 
 const (
 	LastRun_Req = "lastrun"
-	PreRun_Req  = "prerun"
-	PostRun_Req = "postrun"
+	InitRun_Req = "init"
+	Rotate_Req  = "rotate"
 	Socket      = "/tmp/psb_rotator.sock"
 )
 

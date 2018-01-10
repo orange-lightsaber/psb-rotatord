@@ -24,14 +24,14 @@ func Daemonize() {
 				res.Error = err.Error()
 			}
 			res.Response = r
-		case sockets.PreRun_Req:
-			r, err := rotator.PreRun(req.RCD)
+		case sockets.InitRun_Req:
+			r, err := rotator.InitRun(req.RCD)
 			if err != nil {
 				res.Error = err.Error()
 			}
 			res.Response = r
-		case sockets.PostRun_Req:
-			r, err := rotator.PostRun(req.RCD)
+		case sockets.Rotate_Req:
+			r, err := rotator.Rotate(req.RCD)
 			if err != nil {
 				res.Error = err.Error()
 			}
