@@ -46,7 +46,7 @@ func Open(reqHandle func(*Request) *Response) error {
 	if err != nil {
 		return fmt.Errorf("listen error: %s", err.Error())
 	}
-	err = os.Chmod(Socket, 0777)
+	err = os.Chmod(Socket, 0666)
 	if err != nil {
 		return fmt.Errorf("error changing file permissions on %s: %s", Socket, err.Error())
 	}
