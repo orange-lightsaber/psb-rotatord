@@ -19,7 +19,7 @@ func Daemonize() {
 		var res sockets.Response
 		switch req.Request {
 		case sockets.LastRun_Req:
-			r, err := rotator.TimeSinceLastRun(req.RCD.Name)
+			r, err := rotator.TimeSinceLastRun(req.RCD)
 			if err != nil {
 				res.Error = err.Error()
 			}
@@ -31,7 +31,7 @@ func Daemonize() {
 			}
 			res.Response = r
 		case sockets.Rotate_Req:
-			r, err := rotator.Rotate(req.RCD)
+			r, err := rotator.Rotate(req.RCD.Name)
 			if err != nil {
 				res.Error = err.Error()
 			}

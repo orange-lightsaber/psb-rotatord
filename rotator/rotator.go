@@ -22,32 +22,33 @@ type datePaths struct {
 }
 
 type Year struct {
-	Duration int
+	Duration int `toml:"yearly"`
 	datePaths
 }
 type Month struct {
-	Duration int
+	Duration int `toml:"monthly"`
 	datePaths
 }
 type Day struct {
-	Duration int
+	Duration int `toml:"daily"`
 	datePaths
 }
 type Initial struct {
-	Duration int
+	Duration int `toml:"initial"`
 	datePaths
 }
 
 type RunConfigData struct {
-	lastRun          time.Time
-	CompatibilityKey string
-	Name             string
-	Frequency        int
-	RotationDelay    int
+	CompatibilityKey string `toml:"compatibility-key"`
+	Name             string `toml:"name"`
+	BackupDir        string `toml:"backup-directory"`
+	Frequency        int    `toml:"frequency"`
+	RotationDelay    int    `toml:"delay"`
 	Year
 	Month
 	Day
 	Initial
+	lastRun time.Time
 }
 
 func (rcd *RunConfigData) updateLastRun() {
@@ -197,7 +198,7 @@ func cpCmd(src string, dest string) error {
 }
 
 func rotate(rcd RunConfigData) error {
-	psbDir := filepath.Join(Config.Paths.BackupDir, rcd.Name)
+	psbDir := filepath.Join(rcd.BackupDir, rcd.Name)
 	year, month, day, initial, err := populatePathLists(psbDir, rcd)
 	if err != nil {
 		return err
@@ -297,11 +298,18 @@ func rotate(rcd RunConfigData) error {
 }
 
 func rcdInit(rcd RunConfigData) RunConfigData {
-	r := Config.DatePath.Regex
-	rcd.Year.regex = regexp.MustCompile(r.Year + r.Eop)
-	rcd.Month.regex = regexp.MustCompile(r.Year + r.Month + r.Eop)
-	rcd.Day.regex = regexp.MustCompile(r.Year + r.Month + r.Day + r.Eop)
-	rcd.Initial.regex = regexp.MustCompile(r.Year + r.Month + r.Day + r.Time + r.Eop)
+	year := `\/([0-9]{4})`
+	month := `\/([A-Z])\w+`
+	day := `\/([0-9]|0[1-9]|[0-3][0-9])`
+	time := `\/([0-9]{4})Z`
+	eop := `(\z|\/\z?)`
+	rcd.Year.regex = regexp.MustCompile(year + eop)
+	rcd.Month.regex = regexp.MustCompile(year + month + eop)
+	rcd.Day.regex = regexp.MustCompile(year + month + day + eop)
+	rcd.Initial.regex = regexp.MustCompile(year + month + day + time + eop)
+	if rcd.BackupDir == "" {
+		rcd.BackupDir = Config.Paths.BackupDir
+	}
 	return rcd
 }
 
@@ -310,7 +318,7 @@ func lastSnapshotPath(rcd RunConfigData) (string, error) {
 	if rcd.Name == "" {
 		return latestSnapshot, errors.New("no snapshot was requested")
 	}
-	cwd := filepath.Join(Config.Paths.BackupDir, rcd.Name)
+	cwd := filepath.Join(rcd.BackupDir, rcd.Name)
 	err := filepath.Walk(cwd, func(path string, f os.FileInfo, err error) error {
 		if rcd.Initial.hasDatePath(path) {
 			path = strings.Replace(path, cwd, "", -1)
@@ -336,10 +344,10 @@ func lastSnapshotPath(rcd RunConfigData) (string, error) {
 
 }
 
-func TimeSinceLastRun(name string) (res string, err error) {
-	rcd := rcds[name]
-	if rcd.Name != name {
-		rcd.Name = name
+func TimeSinceLastRun(rcd RunConfigData) (res string, err error) {
+	// r := rcds[rcd.Name]
+	if rcd.Name != rcds[rcd.Name].Name {
+		// rcd.Name = rcd.Name
 		rcd = rcdInit(rcd)
 		if err != nil {
 			return
@@ -375,16 +383,16 @@ func InitRun(rcd RunConfigData) (res string, err error) {
 			return
 		}
 	}
-	res = filepath.Join(Config.Paths.BackupDir, rcd.Name, ".tmp")
+	res = filepath.Join(rcd.BackupDir, rcd.Name, ".tmp")
 	return
 }
 
-func Rotate(rcd RunConfigData) (res string, err error) {
-	err = rotate(rcds[rcd.Name])
+func Rotate(name string) (res string, err error) {
+	err = rotate(rcds[name])
 	if err != nil {
 		err = fmt.Errorf("error during rotation: %s", err.Error())
 		return
 	}
-	res = rcds[rcd.Name].lastRun.String()
+	res = rcds[name].lastRun.String()
 	return
 }

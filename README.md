@@ -14,6 +14,8 @@ make install
 ```
 
 ### Enable and start service
+> Note: the -p flag is for defining the absolute path to the backup directory, and the default directory is '/backup', edit the example Systemd file accordingly. If the run config key *backup-directory* has a value, the path is again overridden, but individually unique to that specific backup.
+
 ```sh
 sudo cp ./examples/psb-rotatord.service /etc/systemd/system/psb-rotatord.service
 systemctl enable psb-rotatord.service
