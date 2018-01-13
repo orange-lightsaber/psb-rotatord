@@ -345,13 +345,10 @@ func lastSnapshotPath(rcd RunConfigData) (string, error) {
 }
 
 func TimeSinceLastRun(rcd RunConfigData) (res string, err error) {
-	// r := rcds[rcd.Name]
 	if rcd.Name != rcds[rcd.Name].Name {
-		// rcd.Name = rcd.Name
 		rcd = rcdInit(rcd)
-		if err != nil {
-			return
-		}
+	} else {
+		rcd = rcds[rcd.Name]
 	}
 	nilTime := time.Time{}
 	if rcd.lastRun == nilTime {
@@ -366,16 +363,13 @@ func TimeSinceLastRun(rcd RunConfigData) (res string, err error) {
 		}
 	}
 	dur := time.Now().UTC().Sub(rcd.lastRun)
-	res = dur.Round(time.Second).String()
+	res = dur.String()
 	return
 }
 
 func InitRun(rcd RunConfigData) (res string, err error) {
 	if rcd.Name != rcds[rcd.Name].Name {
 		rcd = rcdInit(rcd)
-		if err != nil {
-			return
-		}
 		rcds[rcd.Name] = rcd
 	} else {
 		if rcd.CompatibilityKey != rcds[rcd.Name].CompatibilityKey {
