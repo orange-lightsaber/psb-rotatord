@@ -1,7 +1,13 @@
 # psb-rotatord
-psb rotation handling
+psb rotation handling for remote backups
 
-This application will daemonize the rotator package, which can be used via the client: psb-rotatorc. The daemon must be ran as a superuser, an example Systemd service file can be found in [./examples](examples). Installing the daemon and client is manditory for all remote backup jobs.
+This application will daemonize the rotator package, which can be used via the client: psb-rotatorc. The daemon must be ran as a superuser, an example Systemd service file can be found in [./examples](examples). Installing the daemon and client is manditory/only for remote backup jobs.
+
+## Prerequisites and setup
+- Add the following line to sudoers file, this is necessary to allow Rsync to maintain file ownership during transfers. Replace "psbuser" with the username of the ssh user that receives.
+    ```
+    psbuser ALL= NOPASSWD:/usr/bin/rsync
+    ```
 
 ### Build
 ```sh
@@ -20,8 +26,4 @@ sudo make install
 sudo cp ./examples/psb-rotatord.service /etc/systemd/system/psb-rotatord.service
 systemctl enable psb-rotatord.service
 systemctl start psb-rotatord.service
-```
-Next, add the following line to sudoers file, this is necessary to allow Rsync to maintain file ownership during transfers.
-```
-psbuser ALL= NOPASSWD:/usr/bin/rsync
 ```
