@@ -10,7 +10,7 @@ make build
 
 ### Install
 ```sh
-make install
+sudo make install
 ```
 
 ### Enable and start service
@@ -20,4 +20,8 @@ make install
 sudo cp ./examples/psb-rotatord.service /etc/systemd/system/psb-rotatord.service
 systemctl enable psb-rotatord.service
 systemctl start psb-rotatord.service
+```
+Next, add the following line to sudoers file, this is necessary to allow Rsync to maintain file ownership during transfers.
+```
+psbuser ALL= NOPASSWD:/usr/bin/rsync
 ```
