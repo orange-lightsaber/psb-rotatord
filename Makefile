@@ -1,6 +1,6 @@
 VERSION=0.1.0
 PATH_BUILD=build/
-FILE_ARCH=linux_arm64
+FILE_ARCH=linux_amd64
 FILE_COMMAND=psb-rotatord
 
 clean:
