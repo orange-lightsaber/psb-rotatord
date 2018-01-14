@@ -377,6 +377,7 @@ func InitRun(rcd RunConfigData) (res string, err error) {
 			return
 		}
 	}
+	rcd = rcds[rcd.Name]
 	res = filepath.Join(rcd.BackupDir, rcd.Name, ".tmp")
 	return
 }
